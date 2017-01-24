@@ -8,14 +8,14 @@
 (def suits #{:clubs :diamonds :hearts :spades})
 
 (def deck
-     (mapcat (fn [rank]
-	       (map (fn [suit] (Card. rank suit)) suits))
-	     ranks))
+  (mapcat (fn [rank]
+            (map (fn [suit] (Card. rank suit)) suits))
+          ranks))
 
 (defn card-of [name suit]
   (first (filter #(and (= (:name (:rank %)) name)
-		       (= (:suit %) suit))
-		 deck)))
+                       (= (:suit %) suit))
+                 deck)))
 
 (defn hand-values [hand]
   (map :value (map :rank hand)))
@@ -23,7 +23,7 @@
 (defn n-of-a-kind? [n hand]
   (let [values (hand-values hand)]
     (boolean (some #(= (count %) n)
-		   (partition-by identity (sort values))))))
+                   (partition-by identity (sort values))))))
 
 (defn high-card-value [hand-vals]
   (apply max hand-vals))
@@ -42,9 +42,9 @@
 
 (defn straight? [hand]
   (let [hand-vals (sort (hand-values hand))
-	min-val   (low-card-value hand-vals)
-	max-val   (high-card-value hand-vals)
-	val-range (range min-val (inc max-val))
+        min-val   (low-card-value hand-vals)
+        max-val   (high-card-value hand-vals)
+        val-range (range min-val (inc max-val))
         straight-length 5]
     (and (= val-range hand-vals)
          (= (count val-range) straight-length))))
@@ -64,7 +64,7 @@
 (defn royal-flush? [hand]
   (and (flush? hand)
        (= (into #{} (map :name (map :rank hand)))
-	  (into #{} (take-last 5 (map :name ranks))))))
+          (into #{} (take-last 5 (map :name ranks))))))
 
 (defn highest-value-score [hand base-score]
   (+ base-score (high-card-value (hand-values hand))))
@@ -77,19 +77,19 @@
 (defn high-card-score [hand]
   (let [rank-names (map #(:name (:rank %)) hand)]
     (letfn [(score [rank-name]
-		   (cond (= rank-name :ace)   3968
-			 (= rank-name :king)  1984
-			 (= rank-name :queen) 992
-			 (= rank-name :jack)  496
-			 (= rank-name :ten)   248
-			 (= rank-name :nine)  124
-			 (= rank-name :eight) 62
-			 (= rank-name :seven) 31
-			 (= rank-name :six)   16
-			 (= rank-name :five)  8
-			 (= rank-name :four)  4
-			 (= rank-name :three) 2
-			 (= rank-name :two)   1))]
+              (cond (= rank-name :ace)   3968
+                    (= rank-name :king)  1984
+                    (= rank-name :queen) 992
+                    (= rank-name :jack)  496
+                    (= rank-name :ten)   248
+                    (= rank-name :nine)  124
+                    (= rank-name :eight) 62
+                    (= rank-name :seven) 31
+                    (= rank-name :six)   16
+                    (= rank-name :five)  8
+                    (= rank-name :four)  4
+                    (= rank-name :three) 2
+                    (= rank-name :two)   1))]
       (apply + (map score rank-names)))))
 
 (defn one-pair-score [hand]
@@ -97,10 +97,10 @@
 
 (defn two-pair-score [hand]
   (let [base-score 9000
-	values (hand-values hand)]
+        values (hand-values hand)]
     (+ base-score
        (apply max (flatten (filter #(= (count %) 2)
-				   (partition-by identity (sort values))))))))
+                                   (partition-by identity (sort values))))))))
 
 (defn three-of-a-kind-score [hand]
   (highest-paired-score hand 10000))
@@ -125,20 +125,20 @@
 
 (defn compute-score [hand]
   (cond (royal-flush? hand) (royal-flush-score hand)
-	(straight-flush? hand) (straight-flush-score hand)
-	(four-of-a-kind? hand) (four-of-a-kind-score hand)
-	(full-house? hand) (full-house-score hand)
-	(flush? hand) (flush-score hand)
-	(straight? hand) (straight-score hand)
-	(three-of-a-kind? hand) (three-of-a-kind-score hand)
-	(two-pair? hand) (two-pair-score hand)
-	(one-pair? hand) (one-pair-score hand)
-	:else (high-card-score hand)))
+        (straight-flush? hand) (straight-flush-score hand)
+        (four-of-a-kind? hand) (four-of-a-kind-score hand)
+        (full-house? hand) (full-house-score hand)
+        (flush? hand) (flush-score hand)
+        (straight? hand) (straight-score hand)
+        (three-of-a-kind? hand) (three-of-a-kind-score hand)
+        (two-pair? hand) (two-pair-score hand)
+        (one-pair? hand) (one-pair-score hand)
+        :else (high-card-score hand)))
 
 (defn winner-of [players]
   (let [scores
-	(into #{}
-	      (mapcat (fn [[player hand]] { player (compute-score hand) })
-		      players))
-	high-score (second (apply max-key second scores))]
+        (into #{}
+              (mapcat (fn [[player hand]] { player (compute-score hand) })
+                      players))
+        high-score (second (apply max-key second scores))]
     (into #{} (map first (filter #(= high-score (second %)) scores)))))

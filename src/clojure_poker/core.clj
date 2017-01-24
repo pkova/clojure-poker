@@ -93,4 +93,9 @@
     (step game)
     false))
 
-
+(defn fold [game player]
+  (if (and (playing? player) (turn? game player))
+    (-> (assoc-in game [:players (.indexOf (:players game) player)] :hand [])
+        (assoc-in game [:players (.indexOf (:players game) player)] :folded true)
+        step)
+    false))

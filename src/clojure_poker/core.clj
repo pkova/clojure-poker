@@ -10,7 +10,7 @@
    :board []
    :big-blind nil
    :small-blind nil
-   :turn nil
+   :turn :pre-flop
    :last-player nil})
 
 (defn player [name chips]
@@ -39,21 +39,30 @@
 (defn turn? [game player]
   (= (:turn game) player))
 
+(defn playing? [player]
+  (not (or (:sit-out player) (:folded player))))
+
 (defn can-raise? [game player total]
   (and
    (turn? game player)
+   (playing? player)
    (>= (:chips player) (- total (:bet player)))
    (<= (+ (:last-raise game) (:biggest-bet game)) total)))
 
 (defn can-call? [game player]
   (and
    (turn? game player)
+   (playing? player)
    (>= (:chips player) (:biggest-bet game))))
 
 (defn can-check? [game player]
   (and
    (turn? game player)
+   (playing? player)
    (= (:bet player) (:biggest-bet game))))
+
+(defn round-over? [game]
+  (= (:turn game) (:last-player)))
 
 (defn- bet [game player total]
   (let [i (.indexOf (:players game) player)
@@ -69,17 +78,19 @@
 
 (defn raise [game player total]
   (if (can-raise? game player total)
-    (bet game player total)
+    (-> (bet game player total)
+        step)
     false))
 
 (defn call [game player]
   (if (can-call? game player)
-    (bet game player (:biggest-bet game))
+    (-> (bet game player (:biggest-bet game))
+        step)
     false))
 
 (defn check [game player]
   (if (can-check? game player)
-    (???)
+    (step game)
     false))
 
 

@@ -64,6 +64,22 @@
 (defn round-over? [game]
   (= (:turn game) (:last-player)))
 
+(defn previous-player [game]
+  (let [playing (map playing? (:players game))
+        total-players (count playing)]
+  (nth playing
+       (+ 1 (.indexOf (reverse (take (+ 1 total-players)
+                                     (cycle playing)))
+                      (:turn game))))))
+
+(defn next-player [game]
+  (let [playing (map playing? (:players game))
+        total-players (count playing)]
+    (nth playing
+         (+ 1 (.indexOf (take (+ 1 total-players)
+                              (cycle playing)))
+                        (:turn game)))))
+
 (defn new-game [game]
   )
 

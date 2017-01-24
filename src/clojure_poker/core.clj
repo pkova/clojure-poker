@@ -99,7 +99,8 @@
                          (assoc-in [:players i] updated-player))]
     (if (< (:biggest-bet game) total)
       (-> (assoc updated-game :biggest-bet total)
-          (assoc :last-raise amount))
+          (assoc :last-raise amount)
+          (assoc :last-player (previous-player game)))
       updated-game)))
 
 (defn raise [game player total]

@@ -64,6 +64,16 @@
 (defn round-over? [game]
   (= (:turn game) (:last-player)))
 
+(defn new-game [game]
+  )
+
+(defn deal-board [game n]
+  (-> (update game :board concat (take n (:deck game)))
+      (update :deck drop n)))
+
+(defn step [game]
+  )
+
 (defn- bet [game player total]
   (let [i (.indexOf (:players game) player)
         amount (- total (:bet player))
